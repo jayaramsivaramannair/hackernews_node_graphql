@@ -4,15 +4,24 @@ const {ApolloServer} = require('apollo-server');
 
 //1
 const typeDefs = `
+  //Query root type has currently two root fields - info and feed
   type Query {
     info: String!
+    feed: [Link!]!
+  }
+
+  //type definition for the Link object type
+  type Link {
+    id: ID!
+    description: String!
+    url: String!
   }
 `
 
 //2 
 const resolvers = {
   Query: {
-    info: () => `This is the API of a Hackernews Clone`
+    info: () => `This is the API of a Hackernews Clone`,
   }
 }
 
