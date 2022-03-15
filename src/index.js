@@ -36,6 +36,45 @@ const resolvers = {
       
       links.push(link)
       return link
+    },
+
+    deleteLink: (parent, args) => {
+      //An array without the deleted link
+      const results = links.filter(link => link.id !== args.id)
+
+      //An array with the deleted link
+      const deleted = links.filter(link => link.id === args.id)
+
+      //Replace items in the links with results
+      links = results
+      if (deleted.length === 0) {
+        return null
+      }
+
+      return deleted[0]
+    },
+
+
+    updateLink: (parent, args) => {
+      //An array without the selected link
+      const results = links.filter(link => link.id !== args.id)
+
+      //Selected Link for updation
+      const updated = links.filter(link => link.id === args.id)[0]
+
+      //Check if the url has been passed in or not
+      if (args.url) {
+        updated.url = args.url
+      }
+
+      //Check if the description has been passed in or not
+      if (args.description) {
+        updated.description = args.description
+      }
+
+      links = [...results, updated]
+
+      return updated
     }
   }
   
