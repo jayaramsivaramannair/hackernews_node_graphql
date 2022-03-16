@@ -3,6 +3,9 @@ const {ApolloServer} = require('apollo-server');
 const fs = require('fs');
 const path = require('path');
 
+//Import PrismaClient
+const {PrismaClient} = require('@prisma/client')
+
 
 //dummy list of links
 let links = [{
@@ -84,6 +87,10 @@ const resolvers = {
 }
 
 
+//Create an instance of a PrismaClient
+const prisma = new PrismaClient()
+
+
 //3 Create the GraphQL server by passing in an object containing typeDefs and resolvers
 const server = new ApolloServer({
   //typeDefs can be provided either directly as a string
@@ -93,6 +100,11 @@ const server = new ApolloServer({
     'utf8'
   ),
   resolvers,
+  //update the server to add an instance of the PrismaClient
+  // Adding context will allow us to access context.prisma in all the resolvers
+  context: {
+    prisma,
+  }
 })
 
 
