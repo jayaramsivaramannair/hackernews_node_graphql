@@ -6,81 +6,62 @@ const path = require('path');
 //Import PrismaClient
 const {PrismaClient} = require('@prisma/client')
 
-
-//dummy list of links
-let links = [{
-  id: 'link-0',
-  url: 'www.howtographql.com',
-  description: 'Fullstack tutorial for GraphQL'
-
-}]
-
 //2 
 const resolvers = {
   Query: {
     info: () => `This is the API of a Hackernews Clone`,
-    feed: () => links,
-    link: (parent, args) => {
-      return links.filter(link => link.id === args.id)[0]
+    feed: async (parent, args, context) => {
+      return context.prisma.link.findMany()
+    },
+    link: async (parent, args, context) => {
+      const result = await context.prisma.link.findUnique({
+        where: {
+          id: Number(args.id),
+        }
+      })
+      return result
     }
   },
+
   Link: {
     id: (parent) => parent.id,
     description: (parent) => parent.description,
     url: (parent) => parent.url,
   },
   Mutation: {
-    post: (parent, args) => {
+    post: (parent, args, context, info) => {
+      const newLink = context.prisma.link.create({
+        data: {
+          url: args.url,
+          description: args.description,
+        },
+      })
+      return newLink
+    },
 
-      let idCount = links.length
+    deleteLink: async (parent, args, context, info) => {
+      const deletedLink = await context.prisma.link.delete({
+        where: {
+          id: Number(args.id)
+        }
+      })
 
-      const link = {
-        id: `link-${idCount++}`,
-        description: args.description,
-        url: args.url,
-      }
+      return deletedLink
+    },
+
+
+    updateLink: async (parent, args, context, info) => {
+      const updatedLink = await context.prisma.link.update({
+        where: {
+          id: Number(args.id)
+        },
+        data: {
+          url: args.url,
+          description: args.description,
+        }
+      })
       
-      links.push(link)
-      return link
-    },
-
-    deleteLink: (parent, args) => {
-      //An array without the deleted link
-      const results = links.filter(link => link.id !== args.id)
-
-      //An array with the deleted link
-      const deleted = links.filter(link => link.id === args.id)
-
-      //Replace items in the links with results
-      links = results
-      if (deleted.length === 0) {
-        return null
-      }
-
-      return deleted[0]
-    },
-
-
-    updateLink: (parent, args) => {
-      //An array without the selected link
-      const results = links.filter(link => link.id !== args.id)
-
-      //Selected Link for updation
-      const updated = links.filter(link => link.id === args.id)[0]
-
-      //Check if the url has been passed in or not
-      if (args.url) {
-        updated.url = args.url
-      }
-
-      //Check if the description has been passed in or not
-      if (args.description) {
-        updated.description = args.description
-      }
-
-      links = [...results, updated]
-
-      return updated
+      return updatedLink
     }
   }
   

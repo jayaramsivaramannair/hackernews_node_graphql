@@ -9,7 +9,7 @@ async function main() {
       description: 'Fullstack tutorial for GraphQL',
       url: 'www.howtographql.com',
     }
-    
+
   })
   const allLinks = await prisma.link.findMany()
   console.log(allLinks)
