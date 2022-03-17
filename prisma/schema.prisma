@@ -14,11 +14,14 @@ datasource db {
 }
 
 //This will tell us what the Link table will look like in the database
+// PostedBy field in the Link model creates a relation between the User and Link table
 model Link {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
   description String
   url String
+  postedBy User? @relation(fields: [postedById], references: [id])
+  postedById Int?
 }
 
 
